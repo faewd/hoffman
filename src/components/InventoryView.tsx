@@ -87,7 +87,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
   }
 
   return (
-    <div className="h-full overflow-y-auto lg:flex lg:flex-row-reverse lg:gap-4" style={{ scrollbarGutter: "stable" }}>
+    <div className="h-full overflow-y-auto pr-6 lg:flex lg:flex-row-reverse lg:gap-8" style={{ scrollbarGutter: "stable" }}>
       <div className="lg:basis-lg">
         <h2 className="text-3xl font-bold mb-4 lg:text-center">{inventory.name}</h2>
         <div className="grid grid-cols-5 gap-4 lg:flex lg:flex-col">
@@ -104,9 +104,9 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
             <h3 className="font-bold text-2xl">Containers</h3>
             <Button onClick={() => setShowAddContainerModal(true)} className="px-2"><IoAddCircle /></Button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 xl:gap-8">
             {inventory.columns.map((col, colIdx) => (
-              <div key={colIdx} className="flex flex-col align-start gap-4">
+              <div key={colIdx} className="flex flex-col align-start gap-4 xl:gap-8">
                 {col.map((container, cardIdx) => (
                   <article key={cardIdx + container.name} className="rounded-xl bg-zinc-950 p-4 py-2 group">
                     {container.kind === "money-pouch"
