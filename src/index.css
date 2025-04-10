@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+html, body, #root {
+  height: 100vh;
+  max-height: 100%;
+}
+
+.font-crimson {
+  font-family: "Crimson Text", serif;
+}
