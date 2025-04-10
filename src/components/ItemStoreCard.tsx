@@ -41,7 +41,8 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
         name: name.trim(),
         value: isNaN(numValue) ? 0 : numValue,
         weight: isNaN(numWeight) ? 0 : numWeight,
-        slotOverride: isNaN(numSlotsOR) ? null : numSlotsOR
+        slotOverride: isNaN(numSlotsOR) ? null : numSlotsOR,
+        equippedSlots: 0
       }
     }
 
@@ -210,8 +211,10 @@ function ItemConfigModal({ show, stack, onClose, saveInventory }: ItemConfigModa
   const [name, setName] = useState(stack.item.name)
   const [value, setValue] = useState(stack.item.value + "")
   const [weight, setWeight] = useState(stack.item.weight + "")
-  const [useOR, setUseOR] = useState(stack.item.slotOverride === null)
+  const [useOR, setUseOR] = useState(stack.item.slotOverride !== null)
   const [slotsOR, setSlotsOR] = useState((stack.item.slotOverride ?? weightToSlots(stack.item.weight)) + "")
+  const [useES, setUseES] = useState(!!stack.item.equippedSlots)
+  const [equippedSlots, setEquippedSlots] = useState(stack.item.equippedSlots + "")
 
   const ref = useRef<HTMLDialogElement>(null)
 
@@ -226,12 +229,14 @@ function ItemConfigModal({ show, stack, onClose, saveInventory }: ItemConfigModa
     const numQuantity = parseInt(quantity, 10)
     const numValue = parseFloat(value)
     const numSlotsOR = parseFloat(slotsOR)
+    const numES = parseFloat(equippedSlots)
     const trimmedName = name.trim()
 
     stack.quantity = isNaN(numQuantity) ? 0 : numQuantity;
     stack.item.name = trimmedName.length === 0 ? stack.item.name : trimmedName;
     stack.item.value = isNaN(numValue) ? 0 : numValue
     stack.item.slotOverride = useOR ? (isNaN(numSlotsOR) ? 0 : numSlotsOR) : null
+    stack.item.equippedSlots = useES && !isNaN(numES) ? numES : 0
 
     saveInventory()
     onClose()
@@ -269,6 +274,18 @@ function ItemConfigModal({ show, stack, onClose, saveInventory }: ItemConfigModa
               <div className="flex gap-2">
                 <label htmlFor="configModalSlotsOR" className="font-bold">Slots <span className="text-zinc-400 font-semibold">(each)</span>:</label>
                 <input id="configModalSlotsOR" type="number" value={slotsOR} min={0} step={0.1} onChange={e => setSlotsOR(e.currentTarget.value)} className="w-16 min-w-10 rounded bg-zinc-950 px-1" />
+              </div>
+            )} 
+          </div>
+          <div className="flex w-full justify-between">
+            <div className="flex gap-4">
+              <label htmlFor="configModalName" className="font-bold">Uses slots while equipped?</label>
+              <input type="checkbox" checked={useES} onChange={e => setUseES(e.currentTarget.checked)} className="appearance-none block w-10 bg-zinc-950 h-6 rounded-full relative cursor-pointer after:absolute after:block after:w-4 after:h-4 after:bg-teal-800 after:rounded-full after:top-1 after:left-1 checked:after:left-5 after:transition-all checked:bg-teal-950" />
+            </div>
+            {useES && (
+              <div className="flex gap-2">
+                <label htmlFor="configModalSlotsOR" className="font-bold">Slots <span className="text-zinc-400 font-semibold">(each)</span>:</label>
+                <input id="configModalSlotsOR" type="number" value={equippedSlots} min={0} step={0.1} onChange={e => setEquippedSlots(e.currentTarget.value)} className="w-16 min-w-10 rounded bg-zinc-950 px-1" />
               </div>
             )} 
           </div>

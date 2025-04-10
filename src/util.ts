@@ -8,12 +8,14 @@ export function weightToSlots(weight: number) {
   return Math.max(0.2, Math.round(weight / 5))
 }
 
-export function resolveItemSlots(item: Item) {
-  return item.slotOverride ?? weightToSlots(item.weight)
+export function resolveItemSlots(item: Item, equipped: boolean = false) {
+  return equipped
+    ? (item.equippedSlots ?? 0)
+    : (item.slotOverride ?? weightToSlots(item.weight))
 }
 
 export function calculateStackSlots(stack: ItemStack) {
-  return stack.quantity * resolveItemSlots(stack.item)
+  return stack.quantity * resolveItemSlots(stack.item, stack.equipped)
 }
 
 export function calculateStackWeight(stack: ItemStack) {

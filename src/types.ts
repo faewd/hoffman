@@ -47,4 +47,5 @@ export type Item = {
   weight: number
   value: number
   slotOverride: number | null
+  equippedSlots: number | null
 }
