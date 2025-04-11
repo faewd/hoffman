@@ -1,6 +1,6 @@
 import { GiClothes, GiCoins, GiKnapsack, GiWeightCrush } from "react-icons/gi"
 import { ItemContainer, ItemStack } from "../types"
-import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, calculateStackSlots, calculateStackWeight, normalizeDecimal, weightToSlots } from "../util"
+import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, calculateStackSlots, normalizeDecimal, weightToSlots } from "../util"
 import { FormEvent, useEffect, useRef, useState } from "react"
 import { AiOutlineFieldNumber } from "react-icons/ai"
 import ContainerControls, { MoveCardFuncs } from "./ContainerControls"
