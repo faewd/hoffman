@@ -5,6 +5,7 @@ html, body, #root {
   max-height: 100%;
 }
 
-.font-crimson {
-  font-family: "Crimson Text", serif;
+.font-lora {
+  font-family: "Lora", sans-serif;
+  font-optical-sizing: auto;
 }

@@ -91,7 +91,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
         <li>
           <hr className="my-2 border-zinc-600 border-0 border-b-2" />
           <form onSubmit={addItem}>
-            <div className="flex gap-1 text-lg">
+            <div className="flex gap-1">
               <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} className="w-10 min-w-10 rounded bg-zinc-900 text-center px-1" />
               <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} className="flex-grow min-w-32 rounded bg-zinc-900 px-1" />
               <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} className="w-10 min-w-10 rounded bg-zinc-900 text-center px-1" />
@@ -171,7 +171,7 @@ function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryPr
   }
 
   return (
-    <li className="group/item flex gap-1 text-lg mb-1 relative rounded-sm">
+    <li className="group/item flex gap-1 mb-1 relative rounded-sm">
       <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
       <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
       <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
