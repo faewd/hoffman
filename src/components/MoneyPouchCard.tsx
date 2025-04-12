@@ -10,12 +10,13 @@ import { Button } from "./Button";
 type MoneyPouchProps = {
   pouch: MoneyPouch,
   saveInventory: () => void,
-  moveCard: MoveCardFuncs
+  moveCard: MoveCardFuncs,
+  deleteCard: () => void
 }
 
 type Denom = keyof MoneyPouch["coins"]
 
-export default function MoneyPouchCard({ pouch, saveInventory, moveCard }: MoneyPouchProps) {
+export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteCard }: MoneyPouchProps) {
 
   const [showPouchConfigModal, setShowPouchConfigModal] = useState(false)
 
@@ -64,7 +65,7 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard }: Money
     <>
       <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{pouch.name}</h4>
-        <ContainerControls moveCard={moveCard} editCard={() => setShowPouchConfigModal(true)} />
+        <ContainerControls moveCard={moveCard} editCard={() => setShowPouchConfigModal(true)} deleteCard={deleteCard} />
         <GiSwapBag size="32" className="text-zinc-500" />
       </div>
       <div className="grid grid-cols-5 gap-2 xl:gap-4">

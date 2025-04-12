@@ -5,17 +5,18 @@ import { FormEvent, useEffect, useRef, useState } from "react"
 import { AiOutlineFieldNumber } from "react-icons/ai"
 import ContainerControls, { MoveCardFuncs } from "./ContainerControls"
 import { Button } from "./Button"
-import { IoSettingsSharp, IoRemoveCircleOutline, IoTrashOutline } from "react-icons/io5"
+import { IoSettingsSharp, IoRemoveCircleOutline, IoTrashSharp } from "react-icons/io5"
 import cx from "../cx"
 import Stat from "./Stat"
 
 type ItemStoreCardProps = {
   store: ItemContainer,
   saveInventory: () => void,
-  moveCard: MoveCardFuncs
+  moveCard: MoveCardFuncs,
+  deleteCard: () => void
 }
 
-export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemStoreCardProps) {
+export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCard }: ItemStoreCardProps) {
 
   const [quantity, setQuantity] = useState("")
   const [name, setName] = useState("")
@@ -77,7 +78,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
     <>
       <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{store.name}</h4>
-        <ContainerControls moveCard={moveCard} editCard={() => setShowStoreConfigModal(true)} />
+        <ContainerControls moveCard={moveCard} editCard={() => setShowStoreConfigModal(true)} deleteCard={deleteCard} />
         <GiKnapsack size="28" className="text-zinc-500 my-[2px]" />
       </div>
       {store.items.length === 0 && <p className="italic text-zinc-500 mb-3 text-center">This container is empty.</p>}
@@ -104,7 +105,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
               {itemsToDelete.length > 0 && (
                 <>
                   <button type="button" onClick={clearSelectedItems} className="rounded bg-zinc-800 px-2 py-px font-bold cursor-pointer transition-colors hover:bg-zinc-700">Clear</button>
-                  <button type="button" onClick={deleteSelectedItems} className="rounded bg-red-950 px-2 py-px font-bold cursor-pointer text-red-100/90 transition-colors hover:bg-red-900">Delete Selected</button>
+                  <button type="button" onClick={deleteSelectedItems} className="rounded bg-rose-950 px-2 py-px font-bold cursor-pointer text-rose-100/90 transition-colors hover:bg-rose-900">Delete Selected</button>
                 </>
               )}
               <button type="submit" className="rounded bg-zinc-800 px-2 py-px font-bold cursor-pointer transition-colors hover:bg-zinc-700 ml-2">Add</button>
@@ -175,11 +176,11 @@ function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryPr
 
   return (
     <li className="group/item flex gap-1 mb-1 relative rounded-sm">
-      <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
-      <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
-      <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
-      <input type="text" value={weight} onChange={e => setWeight(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
-      <output title="Configure Slot Count" className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default", { "opacity-50 bg-red-950 line-through": flagged }, { "text-teal-4java has00 saturate-30": stack.item.slotOverride !== null })}>
+      <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
+      <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
+      <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
+      <input type="text" value={weight} onChange={e => setWeight(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
+      <output title="Configure Slot Count" className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default", { "opacity-50 bg-rose-950 line-through": flagged }, { "text-teal-4java has00 saturate-30": stack.item.slotOverride !== null })}>
         {normalizeDecimal(calculateStackSlots(stack))}
       </output>
       <div className="flex absolute right-33 h-full items-center">
@@ -191,8 +192,8 @@ function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryPr
           <Button onClick={configureStack} className="flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-8 p-0 rounded-sm">
             <IoSettingsSharp />
           </Button>
-          <Button onClick={toggleFlagged} className="flex items-center justify-center bg-red-950 hover:bg-red-900 text-red-100 h-full w-8 p-0 rounded-sm">
-            {flagged ? <IoRemoveCircleOutline /> : <IoTrashOutline />}
+          <Button onClick={toggleFlagged} className="flex items-center justify-center bg-rose-950 hover:bg-rose-900 text-rose-100 h-full w-8 p-0 rounded-sm">
+            {flagged ? <IoRemoveCircleOutline /> : <IoTrashSharp />}
           </Button>
         </div>
       </div>

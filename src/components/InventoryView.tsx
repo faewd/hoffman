@@ -86,6 +86,12 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
     }
   }
 
+  function deleteCard(colIdx: number, cardIdx: number) {
+    const col = inventory.columns[colIdx]
+    col.splice(cardIdx, 1)
+    saveInventory()
+  }
+
   return (
     <div className="h-full overflow-y-auto pr-6 lg:flex lg:flex-row-reverse lg:gap-8" style={{ scrollbarGutter: "stable" }}>
       <div className="lg:basis-lg">
@@ -110,8 +116,8 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
                 {col.map((container, cardIdx) => (
                   <article key={cardIdx + container.name} className="rounded-xl bg-zinc-950 p-4 py-2 group">
                     {container.kind === "money-pouch"
-                      ? <MoneyPouchCard pouch={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} />
-                      : <ItemStoreCard store={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} />
+                      ? <MoneyPouchCard pouch={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} deleteCard={() => deleteCard(colIdx, cardIdx)} />
+                      : <ItemStoreCard store={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} deleteCard={() => deleteCard(colIdx, cardIdx)}  />
                     }
                   </article>
                 ))}
