@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useRef, useState } from "react"
 import { AiOutlineFieldNumber } from "react-icons/ai"
 import ContainerControls, { MoveCardFuncs } from "./ContainerControls"
 import { Button } from "./Button"
-import { IoCogOutline, IoRemoveCircleOutline, IoTrashOutline } from "react-icons/io5"
+import { IoSettingsSharp, IoRemoveCircleOutline, IoTrashOutline } from "react-icons/io5"
 import cx from "../cx"
 import Stat from "./Stat"
 
@@ -24,6 +24,8 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
   const [slotsOR, setSlotsOR] = useState("")
 
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([])
+
+  const [showStoreConfigModal, setShowStoreConfigModal] = useState(false)
 
   function addItem(e: FormEvent) {
     e.preventDefault()
@@ -73,11 +75,12 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
 
   return (
     <>
-      <div className="flex pb-2 gap-2">
+      <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{store.name}</h4>
-        <ContainerControls moveCard={moveCard} />
+        <ContainerControls moveCard={moveCard} editCard={() => setShowStoreConfigModal(true)} />
         <GiKnapsack size="28" className="text-zinc-500 my-[2px]" />
       </div>
+      {store.items.length === 0 && <p className="italic text-zinc-500 mb-3 text-center">This container is empty.</p>}
       <div className="flex gap-1 mb-1 items-center">
         <div className="w-10 min-w-10 flex justify-center px-1 text-zinc-400 text-lg"><AiOutlineFieldNumber /></div>
         <div className="flex-grow min-w-32 px-1 text-zinc-400 font-bold text-sm">Name</div>
@@ -86,7 +89,6 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
         <div className="w-10 min-w-10 flex justify-center px-1 text-zinc-400 text-sm">Slots</div>
       </div>
       <ul className="flex flex-col">
-        {store.items.length === 0 && <p className="italic text-zinc-500">This container is empty.</p>}
         {store.items.map((stack, i) => <ItemEntry key={i} stack={stack} saveInventory={saveInventory} flagged={itemsToDelete.includes(i)} toggleFlagged={() => toggleFlagged(i)} />)}
         <li>
           <hr className="my-2 border-zinc-600 border-0 border-b-2" />
@@ -129,6 +131,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard }: ItemSt
           <span className="ml-px text-xs text-zinc-600 mt-[2px]">lb</span>
         </div>
       </div>
+      <StoreConfigModal store={store} saveInventory={saveInventory} show={showStoreConfigModal} onClose={() => setShowStoreConfigModal(false)} />
     </>
   )
 }
@@ -176,7 +179,7 @@ function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryPr
       <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
       <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
       <input type="text" value={weight} onChange={e => setWeight(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-red-950 line-through": flagged })} />
-      <output title="Configure Slot Count" className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default", { "opacity-50 bg-red-950 line-through": flagged })}>
+      <output title="Configure Slot Count" className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default", { "opacity-50 bg-red-950 line-through": flagged }, { "text-teal-4java has00 saturate-30": stack.item.slotOverride !== null })}>
         {normalizeDecimal(calculateStackSlots(stack))}
       </output>
       <div className="flex absolute right-33 h-full items-center">
@@ -186,7 +189,7 @@ function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryPr
             <GiClothes />
           </Button>
           <Button onClick={configureStack} className="flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-8 p-0 rounded-sm">
-            <IoCogOutline />
+            <IoSettingsSharp />
           </Button>
           <Button onClick={toggleFlagged} className="flex items-center justify-center bg-red-950 hover:bg-red-900 text-red-100 h-full w-8 p-0 rounded-sm">
             {flagged ? <IoRemoveCircleOutline /> : <IoTrashOutline />}
@@ -300,6 +303,58 @@ function ItemConfigModal({ show, stack, onClose, saveInventory }: ItemConfigModa
           <button type="submit" className="bg-teal-950 rounded px-4 py-1 font-bold hover:bg-teal-900 cursor-pointer transition-colors">Save</button>
         </div>
       </form>
+    </dialog>
+  )
+}
+
+
+type StoreConfigModalProps = {
+  show: boolean
+  store: ItemContainer
+  onClose: () => void
+  saveInventory: () => void
+}
+
+function StoreConfigModal({ show, store, onClose, saveInventory }: StoreConfigModalProps) {
+  
+  const [name, setName] = useState(store.name)
+  const [capacity, setCapacity] = useState(store.capacity + "")
+
+  const ref = useRef<HTMLDialogElement>(null);
+  const open = () => ref.current?.showModal()
+  const close = () => ref.current?.close()
+
+  useEffect(() => {
+    if (show) open()
+    else close()
+  }, [ref, show])
+
+  function save() {
+    store.name = name;
+    const numCapacity = parseInt(capacity)
+    if (!isNaN(numCapacity)) store.capacity = numCapacity;
+    saveInventory()
+    close()
+  }
+
+  return (
+    <dialog ref={ref} className="rounded-xl bg-zinc-900 text-zinc-300 m-auto backdrop:bg-zinc-950/70 p-4" onClose={onClose}>
+      <h1 className="font-bold text-3xl text-center my-6">Configure Container</h1>
+      <div className="text-lg grid grid-cols-[max-content_auto] gap-2 items-center">
+        <label htmlFor="configMoneyPouchNameInput" className="font-semibold">Name:</label>
+        <input id="configMoneyPouchNameInput" type="text" value={name} onChange={e => setName(e.target.value)} className="bg-zinc-950 rounded px-2 py-1 w-50" />
+               
+        <label htmlFor="configMoneyPouchSlotsInput" className="font-semibold">Capacity (slots):</label>
+        <input id="configMoneyPouchSlotsInput" type="number" min={0.2}  value={capacity} onChange={e => setCapacity(e.target.value)} step={0.2} className="bg-zinc-950 rounded px-2 py-1 w-20" />
+      </div>
+      <div className="text-lg text-zinc-400 mt-6 max-w-[50ch]">
+        <p className="mt-2">An item store is a container for equipment items such as a bag, pouch, belt or case that can be equipped by a character.</p>
+        <p className="mt-2"><strong>Capacity</strong> is the number of slots available in the container before it is considered full.</p>
+      </div>
+      <div className="mt-4 flex justify-end gap-2">
+        <Button onClick={close} className="bg-zinc-800 hover:bg-zinc-700">Cancel</Button>
+        <Button onClick={save}>Save</Button>
+      </div>
     </dialog>
   )
 }
