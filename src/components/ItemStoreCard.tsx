@@ -68,6 +68,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCa
 
   function deleteSelectedItems() {
     store.items = store.items.filter((_, i) => !itemsToDelete.includes(i))
+    clearSelectedItems()
     saveInventory()
   }
 
