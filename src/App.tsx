@@ -28,7 +28,7 @@ function App() {
       name,
       strengthScore: 10,
       penalties: [],
-      columns: []
+      columns: [[], []]
     }
     inventories.push(inv)
     setSelectedInv(inv);
