@@ -5,9 +5,11 @@ import { calculateContainerSlots, calculateContainerValue, calculateContainerWei
 import { Button } from "./Button"
 import { useState } from "react"
 import AddContainerModal from "./AddContainerModal"
-import { IoAddCircle } from "react-icons/io5"
+import { IoAddCircle, IoSettingsSharp } from "react-icons/io5"
 import ItemStoreCard from "./ItemStoreCard"
 import { MoveCardFuncs } from "./ContainerControls"
+import useModal from "../hooks/useModal"
+import InventoryConfigModal from "./InventoryConfigModal"
 
 type InventoryViewProps = {
   inventory: Inventory,
@@ -17,6 +19,7 @@ type InventoryViewProps = {
 export default function InventoryView({ inventory, saveInventory }: InventoryViewProps) {
 
   const [showAddContainerModal, setShowAddContainerModal] = useState(false)
+  const configModal = useModal()
 
   const containers = inventory!.columns.flat()
   const str = inventory!.strengthScore
@@ -95,7 +98,10 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
   return (
     <div className="h-full overflow-y-auto pr-6 lg:flex lg:flex-row-reverse lg:gap-8" style={{ scrollbarGutter: "stable" }}>
       <div className="lg:basis-lg">
-        <h2 className="text-3xl font-bold mb-4 lg:text-center">{inventory.name}</h2>
+        <div className="mb-4 flex justify-between items-stretch">
+          <h2 className="text-3xl font-bold lg:text-center">{inventory.name}</h2>
+          <Button onClick={configModal.open} className="px-3 bg-primary-900"><IoSettingsSharp /></Button>
+        </div>
         <div className="grid grid-cols-5 gap-4 lg:flex lg:flex-col">
           <Stat name="Strength" value={str} />
           <SplitStat name="Slots" top={normalizeDecimal(slotsUsed)} bottom={invCapactiy} />
@@ -127,6 +133,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
         </div>
 
       <AddContainerModal show={showAddContainerModal} onClose={() => setShowAddContainerModal(false)} addPouch={addPouch} addContainer={addContainer} />
+      <InventoryConfigModal {...configModal} inventory={inventory} saveInventory={saveInventory} />
     </div>
   )
 }
