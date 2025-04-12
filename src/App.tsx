@@ -17,7 +17,7 @@ function App() {
   }, [selectedInv, inventories])
 
   function saveInventory() {
-    setInventories([...inventories])
+    setInventories(structuredClone(inventories))
     localStorage.setItem("hss-invs", JSON.stringify(inventories))
   }
 

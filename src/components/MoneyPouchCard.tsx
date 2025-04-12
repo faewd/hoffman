@@ -1,11 +1,12 @@
 import { GiCoins, GiSwapBag, GiWeightCrush } from "react-icons/gi";
 import { MoneyPouch } from "../types";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { calculateContainerValue, calculateContainerWeight, normalizeDecimal } from "../util";
 import cx from "../cx";
 import ContainerControls, { MoveCardFuncs } from "./ContainerControls";
 import { AiOutlineFieldNumber } from "react-icons/ai";
-import { Button } from "./Button";
+import PouchConfigModal from "./PouchConfigModal";
+import useModal from "../hooks/useModal";
 
 type MoneyPouchProps = {
   pouch: MoneyPouch,
@@ -18,7 +19,7 @@ type Denom = keyof MoneyPouch["coins"]
 
 export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteCard }: MoneyPouchProps) {
 
-  const [showPouchConfigModal, setShowPouchConfigModal] = useState(false)
+  const configModal = useModal()
 
   const [coins, setCoins] = useState(
     Object.fromEntries(
@@ -65,7 +66,7 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteC
     <>
       <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{pouch.name}</h4>
-        <ContainerControls moveCard={moveCard} editCard={() => setShowPouchConfigModal(true)} deleteCard={deleteCard} />
+        <ContainerControls moveCard={moveCard} editCard={configModal.open} deleteCard={deleteCard} />
         <GiSwapBag size="32" className="text-zinc-500" />
       </div>
       <div className="grid grid-cols-5 gap-2 xl:gap-4">
@@ -95,65 +96,7 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteC
           <span className="ml-px text-xs text-zinc-600 mt-[2px]">lb</span>
         </div>
       </div>
-      <PouchConfigModal pouch={pouch} saveInventory={saveInventory} show={showPouchConfigModal} onClose={() => setShowPouchConfigModal(false)} />
+      <PouchConfigModal {...configModal} pouch={pouch} saveInventory={saveInventory} />
     </>
-  )
-}
-
-type PouchConfigModalProps = {
-  show: boolean
-  pouch: MoneyPouch
-  onClose: () => void
-  saveInventory: () => void
-}
-
-function PouchConfigModal({ show, pouch, onClose, saveInventory }: PouchConfigModalProps) {
-  
-  const [name, setName] = useState(pouch.name)
-  const [capacity, setCapacity] = useState(pouch.capacity + "")
-  const [slots, setSlots] = useState(pouch.slots + "")
-
-  const ref = useRef<HTMLDialogElement>(null);
-  const open = () => ref.current?.showModal()
-  const close = () => ref.current?.close()
-
-  useEffect(() => {
-    if (show) open()
-    else close()
-  }, [ref, show])
-
-  function save() {
-    pouch.name = name;
-    const numCapacity = parseInt(capacity, 10)
-    if (!isNaN(numCapacity)) pouch.capacity = numCapacity;
-    const numSlots = parseFloat(slots)
-    if (!isNaN(numSlots)) pouch.slots = numSlots;
-    saveInventory()
-    close()
-  }
-
-  return (
-    <dialog ref={ref} className="rounded-xl bg-zinc-900 text-zinc-300 m-auto backdrop:bg-zinc-950/70 p-4" onClose={onClose}>
-      <h1 className="font-bold text-3xl text-center my-6">Configure Money Pouch</h1>
-      <div className="text-lg grid grid-cols-[max-content_auto] gap-2 items-center">
-        <label htmlFor="configMoneyPouchNameInput" className="font-semibold">Name:</label>
-        <input id="configMoneyPouchNameInput" type="text" value={name} onChange={e => setName(e.target.value)} className="bg-zinc-950 rounded px-2 py-1 w-50" />
-               
-        <label htmlFor="configMoneyPouchSlotsInput" className="font-semibold">Capacity (slots):</label>
-        <input id="configMoneyPouchSlotsInput" type="number" min={0.2}  value={capacity} onChange={e => setCapacity(e.target.value)} step={0.2} className="bg-zinc-950 rounded px-2 py-1 w-20" />
-      
-        <label htmlFor="configMoneyPouchSlotsInput" className="font-semibold">Slots:</label>
-        <input id="configMoneyPouchSlotsInput" type="number" min={0.2}  value={slots} onChange={e => setSlots(e.target.value)} step={0.2} className="bg-zinc-950 rounded px-2 py-1 w-20" />
-      </div>
-      <div className="text-lg text-zinc-400 mt-6">
-        <p className="mt-2">A money pouch is used to hold coins of mixed denominations.</p>
-        <p className="mt-2"><strong>Max coins</strong> is the maximum number of coins that a pouch can contain.</p>
-        <p className="mt-2"><strong>Slots</strong> is the number of slots that the pouch will take up in the wearer's inventory.</p>
-      </div>
-      <div className="mt-4 flex justify-end gap-2">
-        <Button onClick={close} className="bg-zinc-800 hover:bg-zinc-700">Cancel</Button>
-        <Button onClick={save}>Save</Button>
-      </div>
-    </dialog>
   )
 }

@@ -1,35 +1,29 @@
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { GiKnapsack, GiSwapBag } from "react-icons/gi";
 import { Button } from "./Button";
 import { IoArrowBack } from "react-icons/io5";
+import Modal from "./Modal";
+import { ModalProps } from "../hooks/useModal";
 
-type AddContainerModalProps = {
-  show: boolean
-  onClose: () => void
+type AddContainerModalProps = ModalProps & {
   addPouch: (name: string, capacity: number, slots: number) => void
   addContainer: (name: string, capacity: number) => void
 }
 
 type Page = "select-type" | "config-pouch" | "config-item-store"
 
-export default function AddContainerModal({ show, onClose, ...actions }: AddContainerModalProps) {
+export default function AddContainerModal({ addPouch, addContainer, ...modal }: AddContainerModalProps) {
 
-  const ref = useRef<HTMLDialogElement>(null);
   const [page, setPage] = useState<Page>("select-type")
-
+  
   useEffect(() => {
-    if (show) ref.current?.showModal()
-    else ref.current?.close()
-  }, [ref, show])
-
-  function close() {
-    return ref.current?.close();
-  }
+    setPage("select-type")
+  }, [modal.show])
 
   return (
-    <dialog ref={ref} className="rounded-xl bg-zinc-900 text-zinc-300 m-auto backdrop:bg-zinc-950/70 p-4" onClose={onClose}>
-      <ModalPage page={page} setPage={setPage} {...actions} close={close} />
-    </dialog>
+    <Modal {...modal}>
+      <ModalPage {...{ page, setPage, addPouch, addContainer }} close={modal.close} />
+    </Modal>
   )
 }
 

@@ -3,7 +3,6 @@ import Stat, { SplitStat } from "./Stat"
 import { Inventory } from "../types"
 import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, normalizeDecimal, sum } from "../util"
 import { Button } from "./Button"
-import { useState } from "react"
 import AddContainerModal from "./AddContainerModal"
 import { IoAddCircle, IoSettingsSharp } from "react-icons/io5"
 import ItemStoreCard from "./ItemStoreCard"
@@ -18,7 +17,7 @@ type InventoryViewProps = {
 
 export default function InventoryView({ inventory, saveInventory }: InventoryViewProps) {
 
-  const [showAddContainerModal, setShowAddContainerModal] = useState(false)
+  const addContainerModal = useModal()
   const configModal = useModal()
 
   const containers = inventory!.columns.flat()
@@ -38,7 +37,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
       items: []
     })
     saveInventory();
-    setShowAddContainerModal(false)
+    addContainerModal.close();
   }
 
   function addPouch(name: string, capacity: number, slots: number) {
@@ -50,7 +49,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
       coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }
     })
     saveInventory();
-    setShowAddContainerModal(false)
+    addContainerModal.close();
   }
 
   function moveCard(colIdx: number, cardIdx: number): MoveCardFuncs {
@@ -114,7 +113,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
       <div className="mt-4 lg:mt-1 w-full">
           <div className="flex gap-4 items-center mb-4">
             <h3 className="font-bold text-2xl">Containers</h3>
-            <Button onClick={() => setShowAddContainerModal(true)} className="px-2"><IoAddCircle /></Button>
+            <Button onClick={addContainerModal.open} className="px-2"><IoAddCircle /></Button>
           </div>
           <div className="grid grid-cols-2 gap-4 xl:gap-8">
             {inventory.columns.map((col, colIdx) => (
@@ -132,7 +131,7 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
           </div>
         </div>
 
-      <AddContainerModal show={showAddContainerModal} onClose={() => setShowAddContainerModal(false)} addPouch={addPouch} addContainer={addContainer} />
+      <AddContainerModal {...addContainerModal} addPouch={addPouch} addContainer={addContainer} />
       <InventoryConfigModal {...configModal} inventory={inventory} saveInventory={saveInventory} />
     </div>
   )
