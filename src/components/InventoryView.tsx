@@ -3,7 +3,7 @@ import Stat, { SplitStat } from "./Stat"
 import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, normalizeDecimal, sum } from "../util"
 import { Button } from "./Button"
 import AddContainerModal from "./AddContainerModal"
-import { IoAddCircle, IoSettingsSharp } from "react-icons/io5"
+import { IoAddCircle, IoCodeDownloadSharp, IoSettingsSharp } from "react-icons/io5"
 import ItemStoreCard from "./ItemStoreCard"
 import useModal from "../hooks/useModal"
 import InventoryConfigModal from "./InventoryConfigModal"
@@ -27,11 +27,21 @@ export default function InventoryView() {
   const weightLimit = str * 10
   const totalWealth = sum(containers.map(calculateContainerValue))
 
+  function downloadJson() {
+    const blob = new Blob([JSON.stringify(inventory, null, 2)], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.setAttribute("href", url)
+    a.setAttribute("download", `${inventory.name}.json`)
+    a.click()
+  }
+
   return (
     <div className="h-full overflow-y-auto pr-6 lg:flex lg:flex-row-reverse lg:gap-8" style={{ scrollbarGutter: "stable" }}>
       <div className="lg:basis-lg">
-        <div className="mb-4 flex justify-between items-stretch">
-          <h2 className="text-3xl font-bold lg:text-center">{inventory.name}</h2>
+        <div className="mb-4 flex items-stretch">
+          <h2 className="text-3xl font-bold lg:text-center mr-auto">{inventory.name}</h2>
+          <Button onClick={downloadJson} className="px-2 bg-primary-900"><IoCodeDownloadSharp size={22} className="ml-px mt-px" /></Button>
           <Button onClick={configModal.open} className="px-3 bg-primary-900"><IoSettingsSharp /></Button>
         </div>
         <div className="grid grid-cols-5 gap-4 lg:flex lg:flex-col">
