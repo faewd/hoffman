@@ -13,7 +13,6 @@ export function InventoriesProvider({ children }: { children: ReactNode }) {
   const [inventoriesValue, inventoryValue] = useMemo(() => {
     function saveInventories() {
       setInventories([ ...inventories ]);
-      console.log(inventories)
       localStorage.setItem("hss-invs", JSON.stringify(inventories));
     }
 

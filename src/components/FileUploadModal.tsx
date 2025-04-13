@@ -39,7 +39,6 @@ export default function FileUploadModal(modal: ModalProps) {
   function readFile(files: FileList | null) {
     if (files === null) return;
     const readAll = Promise.all<UploadedInventory>([...files].map(file => {
-      console.log(file.name)
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.onload = () => {
