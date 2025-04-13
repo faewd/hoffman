@@ -4,7 +4,7 @@ import { calculateStackSlots, normalizeDecimal } from "../util"
 import { Button } from "./Button"
 import { GiClothes } from "react-icons/gi"
 import cx from "../cx"
-import { IoExit, IoMoveSharp, IoRemoveCircleOutline, IoSettingsSharp, IoTrashSharp } from "react-icons/io5"
+import { IoEllipsisVerticalOutline, IoExit, IoRemoveCircleOutline, IoSettingsSharp, IoTrashSharp } from "react-icons/io5"
 import ItemConfigModal from "./ItemEntryConfigModal"
 import useModal from "../hooks/useModal"
 import { useInventory } from "../hooks/useInventories"
@@ -14,10 +14,13 @@ type ItemEntryProps = {
   stack: ItemStack,
   container: ItemContainer,
   flagged: boolean
-  toggleFlagged: () => void
+  toggleFlagged: () => void,
+  isDragging: boolean,
+  isDragTarget: boolean,
+  startDragging: () => void,
 }
 
-export default function ItemEntry({ stack, container, flagged, toggleFlagged }: ItemEntryProps) {
+export default function ItemEntry({ stack, container, flagged, toggleFlagged, isDragging, isDragTarget, startDragging }: ItemEntryProps) {
 
   const [quantity, setQuantity] = useState(stack.quantity + "")
   const [name, setName] = useState(stack.item.name)
@@ -54,17 +57,21 @@ export default function ItemEntry({ stack, container, flagged, toggleFlagged }: 
   }
 
   return (
-    <li className="group/item flex gap-1 mb-1 relative rounded-sm">
-      <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
-      <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
-      <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
-      <input type="text" value={weight} onChange={e => setWeight(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged })} />
-      <output title="Configure Slot Count" className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default", { "opacity-50 bg-rose-950 line-through": flagged }, { "text-teal-4java has00 saturate-30": stack.item.slotOverride !== null })}>
+    <li className={cx("group/item flex gap-1 mb-1 relative rounded-sm", { "opacity-50": isDragTarget })}>
+      <div onMouseDown={startDragging} className={cx("absolute bg-zinc-900 -left-2 h-full rounded-l items-center hidden cursor-move", { "group-hover/item:flex": !isDragging })}>
+        <IoEllipsisVerticalOutline className="-mr-3" />
+        <IoEllipsisVerticalOutline className="-mr-1" />
+      </div>
+      <input type="text" value={quantity} onChange={e => setQuantity(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged }, { "cursor-grabbing!": isDragging })} />
+      <input type="text" value={name} onChange={e => setName(e.currentTarget.value)} onBlur={commit} className={cx("flex-grow min-w-32 rounded bg-zinc-900 px-1", { "opacity-50 bg-rose-950 line-through": flagged }, { "cursor-grabbing!": isDragging })} />
+      <input type="text" value={value} onChange={e => setValue(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged }, { "cursor-grabbing!": isDragging })} />
+      <input type="text" value={weight} onChange={e => setWeight(e.currentTarget.value)} onBlur={commit} className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1", { "opacity-50 bg-rose-950 line-through": flagged }, { "cursor-grabbing!": isDragging })} />
+      <output className={cx("w-10 min-w-10 rounded bg-zinc-900 text-center px-1 cursor-default select-none", { "opacity-50 bg-rose-950 line-through": flagged }, { "text-teal-4java has00 saturate-30": stack.item.slotOverride !== null }, { "cursor-grabbing!": isDragging })}>
         {normalizeDecimal(calculateStackSlots(stack))}
       </output>
       <div className="flex absolute right-33 h-full items-center">
         { stack.equipped && <div className="w-3 h-3 bg-teal-800 rounded-full mr-2 border-3 border-zinc-900"></div> }
-        <div className="hidden group-hover/item:flex gap-1 h-full">
+        <div className={cx("hidden gap-1 h-full", { "group-hover/item:flex": !isDragging })}>
           <Button onClick={toggleEquipped} className={cx("flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-6 p-0 rounded-sm", { "bg-teal-950 text-teal-100 hover:bg-teal-900": stack.equipped })}>
             <GiClothes />
           </Button>
