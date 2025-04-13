@@ -31,6 +31,7 @@ export function InventoriesProvider({ children }: { children: ReactNode }) {
   
     const inventoriesValue = {
       inventories,
+      saveInventories,
       selectedInventory,
       setSelectedInventory,
       addInventory,

@@ -3,6 +3,7 @@ import { Container, Inventory } from "../types";
 
 type InventoriesContextValue = {
   inventories: Inventory[];
+  saveInventories(): void;
   selectedInventory: Inventory | null;
   setSelectedInventory(inventory: Inventory): void;
   addInventory(name: string, strengthScore: number): void;
@@ -10,6 +11,7 @@ type InventoriesContextValue = {
 
 const InventoriesContext = createContext<InventoriesContextValue>({
   inventories: [],
+  saveInventories() {},
   selectedInventory: null,
   addInventory(_name, _str) {},
   setSelectedInventory(_inv) {}

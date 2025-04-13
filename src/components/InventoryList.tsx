@@ -2,6 +2,8 @@ import { IoArrowBack, IoArrowForward } from "react-icons/io5"
 import { Button } from "./Button"
 import cx from "../cx"
 import { useInventories } from "../hooks/useInventories"
+import FileUploadModal from "./FileUploadModal"
+import useModal from "../hooks/useModal"
 
 type InventoryListProps = {
   show: boolean
@@ -11,6 +13,8 @@ type InventoryListProps = {
 export default function InventoryList({ show, setShow}: InventoryListProps) {
 
   const { inventories, selectedInventory, setSelectedInventory, addInventory } = useInventories()
+
+  const uploadModal = useModal()
 
   function createInventory() {
     const name = prompt("Inventory name:")
@@ -38,11 +42,15 @@ export default function InventoryList({ show, setShow}: InventoryListProps) {
           <Button onClick={createInventory} className="block mx-auto mt-6 bg-teal-950 hover:bg-teal-900">
             New Inventory
           </Button>
+          <Button onClick={uploadModal.open} className="block mx-auto mt-2 bg-zinc-950 hover:bg-zinc-800">
+            Upload JSON
+          </Button>
         </div>
       )}
       <Button onClick={toggle} className={cx({"-right-4 bg-zinc-900": show, "ps-4 pe-1 -right-6": !show}, "absolute top-1/2 px-2 py-6 z-10")}>
         { show ? <IoArrowBack /> : <IoArrowForward /> }
       </Button>
+      <FileUploadModal {...uploadModal} />
     </aside>
   )
 }
