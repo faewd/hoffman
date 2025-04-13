@@ -3,19 +3,17 @@ import { ItemContainer, ItemStack } from "../types"
 import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, normalizeDecimal } from "../util"
 import { FormEvent, useState } from "react"
 import { AiOutlineFieldNumber } from "react-icons/ai"
-import ContainerControls, { MoveCardFuncs } from "./ContainerControls"
+import ContainerControls from "./ContainerControls"
 import StoreConfigModal from "./StoreConfigModal"
 import useModal from "../hooks/useModal"
 import ItemEntry from "./ItemEntry"
+import { useInventory } from "../hooks/useInventories"
 
 type ItemStoreCardProps = {
   store: ItemContainer,
-  saveInventory: () => void,
-  moveCard: MoveCardFuncs,
-  deleteCard: () => void
 }
 
-export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCard }: ItemStoreCardProps) {
+export default function ItemStoreCard({ store }: ItemStoreCardProps) {
 
   const [quantity, setQuantity] = useState("")
   const [name, setName] = useState("")
@@ -24,6 +22,8 @@ export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCa
   const [slotsOR, setSlotsOR] = useState("")
 
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([])
+
+  const { saveInventory } = useInventory()
 
   const configModal = useModal()
 
@@ -78,7 +78,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCa
     <>
       <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{store.name}</h4>
-        <ContainerControls moveCard={moveCard} editCard={configModal.open} deleteCard={deleteCard} />
+        <ContainerControls container={store} onEdit={configModal.open} />
         <GiKnapsack size="28" className="text-zinc-500 my-[2px]" />
       </div>
       {store.items.length === 0 && <p className="italic text-zinc-500 mb-3 text-center">This container is empty.</p>}
@@ -90,7 +90,7 @@ export default function ItemStoreCard({ store, saveInventory, moveCard, deleteCa
         <div className="w-10 min-w-10 flex justify-center px-1 text-zinc-400 text-sm">Slots</div>
       </div>
       <ul className="flex flex-col">
-        {store.items.map((stack, i) => <ItemEntry key={i} stack={stack} saveInventory={saveInventory} flagged={itemsToDelete.includes(i)} toggleFlagged={() => toggleFlagged(i)} />)}
+        {store.items.map((stack, i) => <ItemEntry key={i} stack={stack} flagged={itemsToDelete.includes(i)} toggleFlagged={() => toggleFlagged(i)} />)}
         <li>
           <hr className="my-2 border-zinc-600 border-0 border-b-2" />
           <form onSubmit={addItem}>

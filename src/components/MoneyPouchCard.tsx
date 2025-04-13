@@ -1,37 +1,35 @@
 import { GiCoins, GiSwapBag, GiWeightCrush } from "react-icons/gi";
-import { MoneyPouch } from "../types";
+import { Denomination, MoneyPouch } from "../types";
 import { useState } from "react";
 import { calculateContainerValue, calculateContainerWeight, normalizeDecimal } from "../util";
 import cx from "../cx";
-import ContainerControls, { MoveCardFuncs } from "./ContainerControls";
+import ContainerControls from "./ContainerControls";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 import PouchConfigModal from "./PouchConfigModal";
 import useModal from "../hooks/useModal";
+import { useInventory } from "../hooks/useInventories";
 
 type MoneyPouchProps = {
   pouch: MoneyPouch,
-  saveInventory: () => void,
-  moveCard: MoveCardFuncs,
-  deleteCard: () => void
 }
 
-type Denom = keyof MoneyPouch["coins"]
-
-export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteCard }: MoneyPouchProps) {
+export default function MoneyPouchCard({ pouch }: MoneyPouchProps) {
 
   const configModal = useModal()
+
+  const { saveInventory } = useInventory()
 
   const [coins, setCoins] = useState(
     Object.fromEntries(
       Object.entries(pouch.coins)
             .map(([k, v]) => [k, v.toString()])
-    ) as Record<Denom, string>
+    ) as Record<Denomination, string>
   )
 
-  const entries = Object.entries(coins) as [Denom, string][]
+  const entries = Object.entries(coins) as [Denomination, string][]
   const totalCoins = entries.map(([_, n]) => +n).reduce((a, b) => a + b)
 
-  function setCoin(denomination: Denom, value: string) {
+  function setCoin(denomination: Denomination, value: string) {
     setCoins({
       ...coins,
       [denomination]: value
@@ -43,18 +41,20 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteC
       ...pouch.coins,
       [denomination]: isNaN(intValue) ? 0 : intValue
     };
-    saveInventory();
+
+    saveInventory()
   }
 
-  function normalizeCoin(denomination: Denom) {
+  function normalizeCoin(denomination: Denomination) {
     const intValue = parseInt(coins[denomination], 10)
     setCoins({
       ...coins,
       [denomination]: isNaN(intValue) ? 0 : intValue
     })
+    saveInventory()
   }
 
-  const denomColor: Record<Denom, string> = {
+  const denomColor: Record<Denomination, string> = {
     cp: "text-amber-700",
     sp: "text-slate-400",
     ep: "text-amber-100",
@@ -66,7 +66,7 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteC
     <>
       <div className="flex pb-2 gap-2 items-center">
         <h4 className="text-lg font-semibold mr-auto">{pouch.name}</h4>
-        <ContainerControls moveCard={moveCard} editCard={configModal.open} deleteCard={deleteCard} />
+        <ContainerControls container={pouch} onEdit={configModal.open} />
         <GiSwapBag size="32" className="text-zinc-500" />
       </div>
       <div className="grid grid-cols-5 gap-2 xl:gap-4">
@@ -96,7 +96,7 @@ export default function MoneyPouchCard({ pouch, saveInventory, moveCard, deleteC
           <span className="ml-px text-xs text-zinc-600 mt-[2px]">lb</span>
         </div>
       </div>
-      <PouchConfigModal {...configModal} pouch={pouch} saveInventory={saveInventory} />
+      <PouchConfigModal {...configModal} pouch={pouch} />
     </>
   )
 }

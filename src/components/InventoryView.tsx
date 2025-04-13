@@ -1,24 +1,22 @@
 import MoneyPouchCard from "./MoneyPouchCard"
 import Stat, { SplitStat } from "./Stat"
-import { Inventory } from "../types"
 import { calculateContainerSlots, calculateContainerValue, calculateContainerWeight, normalizeDecimal, sum } from "../util"
 import { Button } from "./Button"
 import AddContainerModal from "./AddContainerModal"
 import { IoAddCircle, IoSettingsSharp } from "react-icons/io5"
 import ItemStoreCard from "./ItemStoreCard"
-import { MoveCardFuncs } from "./ContainerControls"
 import useModal from "../hooks/useModal"
 import InventoryConfigModal from "./InventoryConfigModal"
+import { useInventory } from "../hooks/useInventories"
 
-type InventoryViewProps = {
-  inventory: Inventory,
-  saveInventory: () => void
-}
-
-export default function InventoryView({ inventory, saveInventory }: InventoryViewProps) {
+export default function InventoryView() {
 
   const addContainerModal = useModal()
   const configModal = useModal()
+
+  const { inventory: maybeInv } = useInventory()
+  if (maybeInv === null) return <p className="text-center italic text-zinc-400">No inventory selected.</p>
+  const inventory = maybeInv
 
   const containers = inventory!.columns.flat()
   const str = inventory!.strengthScore
@@ -28,71 +26,6 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
   const carriedWeight = sum(containers.map(calculateContainerWeight))
   const weightLimit = str * 10
   const totalWealth = sum(containers.map(calculateContainerValue))
-
-  function addContainer(name: string, capacity: number) {
-    inventory.columns[0].unshift({
-      kind: "item-container",
-      name,
-      capacity,
-      items: []
-    })
-    saveInventory();
-    addContainerModal.close();
-  }
-
-  function addPouch(name: string, capacity: number, slots: number) {
-    inventory.columns[0].unshift({
-      kind: "money-pouch",
-      name,
-      capacity,
-      slots,
-      coins: { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 }
-    })
-    saveInventory();
-    addContainerModal.close();
-  }
-
-  function moveCard(colIdx: number, cardIdx: number): MoveCardFuncs {
-    return {
-      left() {
-        if (colIdx === 0) return;
-        const col = inventory.columns[colIdx]
-        const leftCol = inventory.columns[colIdx - 1]
-        const [card] = col.splice(cardIdx, 1)
-        leftCol.unshift(card)
-        saveInventory()
-      },
-      right() {
-        if (colIdx === 1) return;
-        const col = inventory.columns[colIdx]
-        const [card] = col.splice(cardIdx, 1)
-        if (inventory.columns.length === 1) inventory.columns.push([])
-        const rightCol = inventory.columns[colIdx + 1]
-        rightCol.unshift(card)
-        saveInventory()
-      },
-      up() {
-        if (cardIdx === 0) return;
-        const col = inventory.columns[colIdx]
-        const [card] = col.splice(cardIdx, 1)
-        col.splice(cardIdx - 1, 0, card)
-        saveInventory()
-      },
-      down() {
-        const col = inventory.columns[colIdx]
-        if (cardIdx === col.length - 1) return;
-        const [card] = col.splice(cardIdx, 1)
-        col.splice(cardIdx + 1, 0, card)
-        saveInventory()
-      }
-    }
-  }
-
-  function deleteCard(colIdx: number, cardIdx: number) {
-    const col = inventory.columns[colIdx]
-    col.splice(cardIdx, 1)
-    saveInventory()
-  }
 
   return (
     <div className="h-full overflow-y-auto pr-6 lg:flex lg:flex-row-reverse lg:gap-8" style={{ scrollbarGutter: "stable" }}>
@@ -121,8 +54,8 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
                 {col.map((container, cardIdx) => (
                   <article key={cardIdx + container.name} className="rounded-xl bg-zinc-950 p-4 py-2 group">
                     {container.kind === "money-pouch"
-                      ? <MoneyPouchCard pouch={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} deleteCard={() => deleteCard(colIdx, cardIdx)} />
-                      : <ItemStoreCard store={container} saveInventory={saveInventory} moveCard={moveCard(colIdx, cardIdx)} deleteCard={() => deleteCard(colIdx, cardIdx)}  />
+                      ? <MoneyPouchCard pouch={container} />
+                      : <ItemStoreCard store={container} />
                     }
                   </article>
                 ))}
@@ -131,8 +64,8 @@ export default function InventoryView({ inventory, saveInventory }: InventoryVie
           </div>
         </div>
 
-      <AddContainerModal {...addContainerModal} addPouch={addPouch} addContainer={addContainer} />
-      <InventoryConfigModal {...configModal} inventory={inventory} saveInventory={saveInventory} />
+      <AddContainerModal {...addContainerModal} />
+      <InventoryConfigModal {...configModal} />
     </div>
   )
 }

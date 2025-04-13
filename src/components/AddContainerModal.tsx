@@ -4,15 +4,11 @@ import { Button } from "./Button";
 import { IoArrowBack } from "react-icons/io5";
 import Modal from "./Modal";
 import { ModalProps } from "../hooks/useModal";
-
-type AddContainerModalProps = ModalProps & {
-  addPouch: (name: string, capacity: number, slots: number) => void
-  addContainer: (name: string, capacity: number) => void
-}
+import { useInventory } from "../hooks/useInventories";
 
 type Page = "select-type" | "config-pouch" | "config-item-store"
 
-export default function AddContainerModal({ addPouch, addContainer, ...modal }: AddContainerModalProps) {
+export default function AddContainerModal(modal: ModalProps) {
 
   const [page, setPage] = useState<Page>("select-type")
   
@@ -22,7 +18,7 @@ export default function AddContainerModal({ addPouch, addContainer, ...modal }: 
 
   return (
     <Modal {...modal}>
-      <ModalPage {...{ page, setPage, addPouch, addContainer }} close={modal.close} />
+      <ModalPage {...{ page, setPage }} close={modal.close} />
     </Modal>
   )
 }
@@ -31,8 +27,6 @@ type ModalPageProps = {
   page: Page;
   setPage: (page: Page) => void
   close: () => void
-  addPouch: (name: string, capacity: number, slots: number) => void
-  addContainer: (name: string, capacity: number) => void
 }
 
 function ModalPage(props: ModalPageProps) {
@@ -72,11 +66,18 @@ function TypeSelection({ setPage }: ModalPageProps) {
   )
 }
 
-function PouchConfig({ addPouch, setPage, close }: ModalPageProps) {
+function PouchConfig({ setPage, close }: ModalPageProps) {
 
   const [name, setName] = useState("Coin Purse")
   const [capacity, setCapacity] = useState(100)
   const [slots, setSlots] = useState(1)
+
+  const { addPouch } = useInventory()
+
+  function createPouch(name: string, capacity: number, slots: number) {
+    addPouch(name, capacity, slots);
+    close();
+  }
 
   return (
     <ModalContent title="Configure Money Pouch">
@@ -101,16 +102,23 @@ function PouchConfig({ addPouch, setPage, close }: ModalPageProps) {
       </div>
       <div className="mt-4 flex justify-end gap-2">
         <Button onClick={close} className="bg-zinc-800 hover:bg-zinc-700">Cancel</Button>
-        <Button onClick={() => addPouch(name, capacity, slots)}>Add</Button>
+        <Button onClick={() => createPouch(name, capacity, slots)}>Add</Button>
       </div>
     </ModalContent>
   )
 }
 
-function ItemStoreConfig({ addContainer, setPage, close }: ModalPageProps) {
+function ItemStoreConfig({ setPage, close }: ModalPageProps) {
 
   const [name, setName] = useState("Backpack")
   const [capacity, setCapacity] = useState(10)
+
+  const { addContainer } = useInventory()
+
+  function createContainer(name: string, capacity: number) {
+    addContainer(name, capacity)
+    close();
+  }
 
   return (
     <ModalContent title="Configure Item Storage">
@@ -131,7 +139,7 @@ function ItemStoreConfig({ addContainer, setPage, close }: ModalPageProps) {
       </div>
       <div className="mt-4 flex justify-end gap-2">
         <Button onClick={close} className="bg-zinc-800 hover:bg-zinc-700">Cancel</Button>
-        <Button onClick={() => addContainer(name, capacity)}>Add</Button>
+        <Button onClick={() => createContainer(name, capacity)}>Add</Button>
       </div>
     </ModalContent>
   )

@@ -1,18 +1,22 @@
 import { IoArrowBack, IoArrowForward } from "react-icons/io5"
-import { Inventory } from "../types"
 import { Button } from "./Button"
 import cx from "../cx"
+import { useInventories } from "../hooks/useInventories"
 
 type InventoryListProps = {
   show: boolean
   setShow: (show: boolean) => void
-  inventories: Inventory[],
-  selectedInv: Inventory | null,
-  setSelectedInv: (inv: Inventory) => void
-  createInventory: () => void
 }
 
-export default function InventoryList({ show, setShow, inventories, selectedInv, setSelectedInv, createInventory }: InventoryListProps) {
+export default function InventoryList({ show, setShow}: InventoryListProps) {
+
+  const { inventories, selectedInventory, setSelectedInventory, addInventory } = useInventories()
+
+  function createInventory() {
+    const name = prompt("Inventory name:")
+    if (name === null) return;
+    addInventory(name, 10)
+  }
 
   function toggle() {
     setShow(!show)
@@ -26,7 +30,7 @@ export default function InventoryList({ show, setShow, inventories, selectedInv,
           <ul className="px-4">
             {inventories.map((inv, i) => (
               <li key={i} className="mb-2">
-                <Button onClick={() => setSelectedInv(inv)} className={`block w-full text-left ${inv === selectedInv ? "bg-zinc-800 text-zinc-100" : ""}`}>{inv.name}</Button>
+                <Button onClick={() => setSelectedInventory(inv)} className={`block w-full text-left ${inv === selectedInventory ? "bg-zinc-800 text-zinc-100" : ""}`}>{inv.name}</Button>
               </li>
             ))}
           </ul>

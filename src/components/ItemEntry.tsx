@@ -7,15 +7,15 @@ import cx from "../cx"
 import { IoRemoveCircleOutline, IoSettingsSharp, IoTrashSharp } from "react-icons/io5"
 import ItemConfigModal from "./ItemEntryConfigModal"
 import useModal from "../hooks/useModal"
+import { useInventory } from "../hooks/useInventories"
 
 type ItemEntryProps = {
   stack: ItemStack,
-  saveInventory: () => void
   flagged: boolean
   toggleFlagged: () => void
 }
 
-export default function ItemEntry({ stack, saveInventory, flagged, toggleFlagged }: ItemEntryProps) {
+export default function ItemEntry({ stack, flagged, toggleFlagged }: ItemEntryProps) {
 
   const [quantity, setQuantity] = useState(stack.quantity + "")
   const [name, setName] = useState(stack.item.name)
@@ -23,6 +23,8 @@ export default function ItemEntry({ stack, saveInventory, flagged, toggleFlagged
   const [weight, setWeight] = useState(stack.item.weight + "")
 
   const configModal = useModal()
+
+  const { saveInventory } = useInventory()
 
   useEffect(() => {
     setQuantity(stack.quantity + "")

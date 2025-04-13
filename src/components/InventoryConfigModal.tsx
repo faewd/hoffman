@@ -1,25 +1,23 @@
 import { useEffect, useState } from "react";
 import { ModalProps } from "../hooks/useModal";
-import { Inventory } from "../types";
 import Modal from "./Modal";
 import { Button } from "./Button";
+import { useInventory } from "../hooks/useInventories";
 
-type InventoryConfigModalProps = ModalProps & {
-  inventory: Inventory
-  saveInventory: () => void
-}
+export default function InventoryConfigModal(modal: ModalProps) {
 
-export default function InventoryConfigModal({ inventory, saveInventory, ...modal }: InventoryConfigModalProps) {
+  const { inventory, saveInventory } = useInventory()
 
-  const [name, setName] = useState(inventory.name)
-  const [str, setStr] = useState(inventory.strengthScore + "")
+  const [name, setName] = useState(inventory?.name ?? "")
+  const [str, setStr] = useState((inventory?.strengthScore ?? 10) + "")
 
   useEffect(() => {
-    setName(inventory.name)
-    setStr(inventory.strengthScore + "")
+    setName(inventory?.name ?? "")
+    setStr((inventory?.strengthScore ?? 10) + "")
   }, [inventory, modal.show])
 
   function save() {
+    if (inventory === null) return;
     inventory.name = name;
 
     const numStr = parseInt(str, 10);

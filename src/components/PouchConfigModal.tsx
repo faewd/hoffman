@@ -3,17 +3,19 @@ import { ModalProps } from "../hooks/useModal"
 import { MoneyPouch } from "../types"
 import { Button } from "./Button"
 import Modal from "./Modal"
+import { useInventory } from "../hooks/useInventories"
 
 type PouchConfigModalProps = ModalProps & {
   pouch: MoneyPouch
-  saveInventory: () => void
 }
 
-export default function PouchConfigModal({ pouch, saveInventory, ...modal }: PouchConfigModalProps) {
+export default function PouchConfigModal({ pouch, ...modal }: PouchConfigModalProps) {
   
   const [name, setName] = useState(pouch.name)
   const [capacity, setCapacity] = useState(pouch.capacity + "")
   const [slots, setSlots] = useState(pouch.slots + "")
+
+  const { saveInventory } = useInventory()
 
   function save() {
     pouch.name = name;
