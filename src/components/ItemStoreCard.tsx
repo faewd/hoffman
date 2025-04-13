@@ -90,7 +90,7 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
         <div className="w-10 min-w-10 flex justify-center px-1 text-zinc-400 text-sm">Slots</div>
       </div>
       <ul className="flex flex-col">
-        {store.items.map((stack, i) => <ItemEntry key={i} stack={stack} flagged={itemsToDelete.includes(i)} toggleFlagged={() => toggleFlagged(i)} />)}
+        {store.items.map((stack, i) => <ItemEntry key={i} stack={stack} container={store} flagged={itemsToDelete.includes(i)} toggleFlagged={() => toggleFlagged(i)} />)}
         <li>
           <hr className="my-2 border-zinc-600 border-0 border-b-2" />
           <form onSubmit={addItem}>

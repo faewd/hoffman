@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react"
-import { ItemStack } from "../types"
+import { ItemContainer, ItemStack } from "../types"
 import { calculateStackSlots, normalizeDecimal } from "../util"
 import { Button } from "./Button"
 import { GiClothes } from "react-icons/gi"
 import cx from "../cx"
-import { IoRemoveCircleOutline, IoSettingsSharp, IoTrashSharp } from "react-icons/io5"
+import { IoExit, IoMoveSharp, IoRemoveCircleOutline, IoSettingsSharp, IoTrashSharp } from "react-icons/io5"
 import ItemConfigModal from "./ItemEntryConfigModal"
 import useModal from "../hooks/useModal"
 import { useInventory } from "../hooks/useInventories"
+import MoveItemModal from "./MoveItemModal"
 
 type ItemEntryProps = {
   stack: ItemStack,
+  container: ItemContainer,
   flagged: boolean
   toggleFlagged: () => void
 }
 
-export default function ItemEntry({ stack, flagged, toggleFlagged }: ItemEntryProps) {
+export default function ItemEntry({ stack, container, flagged, toggleFlagged }: ItemEntryProps) {
 
   const [quantity, setQuantity] = useState(stack.quantity + "")
   const [name, setName] = useState(stack.item.name)
@@ -23,6 +25,7 @@ export default function ItemEntry({ stack, flagged, toggleFlagged }: ItemEntryPr
   const [weight, setWeight] = useState(stack.item.weight + "")
 
   const configModal = useModal()
+  const moveModal = useModal()
 
   const { saveInventory } = useInventory()
 
@@ -62,18 +65,22 @@ export default function ItemEntry({ stack, flagged, toggleFlagged }: ItemEntryPr
       <div className="flex absolute right-33 h-full items-center">
         { stack.equipped && <div className="w-3 h-3 bg-teal-800 rounded-full mr-2 border-3 border-zinc-900"></div> }
         <div className="hidden group-hover/item:flex gap-1 h-full">
-          <Button onClick={toggleEquipped} className={cx("flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-8 p-0 rounded-sm", { "bg-teal-950 text-teal-100 hover:bg-teal-900": stack.equipped })}>
+          <Button onClick={toggleEquipped} className={cx("flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-6 p-0 rounded-sm", { "bg-teal-950 text-teal-100 hover:bg-teal-900": stack.equipped })}>
             <GiClothes />
           </Button>
-          <Button onClick={configModal.open} className="flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-8 p-0 rounded-sm">
+          <Button onClick={configModal.open} className="flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-6 p-0 rounded-sm">
             <IoSettingsSharp />
           </Button>
-          <Button onClick={toggleFlagged} className="flex items-center justify-center bg-rose-950 hover:bg-rose-900 text-rose-100 h-full w-8 p-0 rounded-sm">
+          <Button onClick={moveModal.open} className="flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 h-full w-6 p-0 rounded-sm">
+            <IoExit />
+          </Button>
+          <Button onClick={toggleFlagged} className="flex items-center justify-center bg-rose-950 hover:bg-rose-900 text-rose-100 h-full w-6 p-0 rounded-sm">
             {flagged ? <IoRemoveCircleOutline /> : <IoTrashSharp />}
           </Button>
         </div>
       </div>
       <ItemConfigModal {...configModal} stack={stack} saveInventory={saveInventory} />
+      <MoveItemModal {...moveModal} stack={stack} currentContainer={container} />
     </li>
   )
 }
