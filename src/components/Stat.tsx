@@ -7,7 +7,7 @@ type StatProps = {
 export default function Stat({ name, value, unit }: StatProps) {
   return (
     <div className="h-full flex flex-col">
-      <div className="rounded-t-lg bg-zinc-950 text-3xl p-2 text-zinc-400 flex-grow flex items-center justify-center">
+      <div className="rounded-t-lg bg-zinc-950 text-4xl p-2 text-zinc-400 flex-grow flex items-center justify-center">
         <div>
           {value}{unit && <span className="text-zinc-600 font-semibold text-xl ml-[2px]">{unit}</span>}
         </div>
