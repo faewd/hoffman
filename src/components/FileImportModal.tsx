@@ -3,8 +3,9 @@ import { ModalProps } from "../hooks/useModal";
 import Modal from "./Modal";
 import { Inventory } from "../types";
 import { useInventories } from "../hooks/useInventories";
+import { IoPush, IoPushOutline } from "react-icons/io5";
 
-type UploadedInventory = 
+type ImportedInventory = 
   | { file: string; valid: false }
   | { file: string; valid: true } & Inventory
 
@@ -24,10 +25,10 @@ function isValidInventory(data: unknown) {
     && Array.isArray(data.columns) && data.columns.length == 2
 }
 
-export default function FileUploadModal(modal: ModalProps) {
+export default function FileImportModal(modal: ModalProps) {
 
   const [fileSelected, setFileSelected] = useState(false)
-  const [invs, setInvs] = useState<UploadedInventory[]>([])
+  const [invs, setInvs] = useState<ImportedInventory[]>([])
 
   const { inventories, saveInventories } = useInventories();
 
@@ -38,7 +39,7 @@ export default function FileUploadModal(modal: ModalProps) {
 
   function readFile(files: FileList | null) {
     if (files === null) return;
-    const readAll = Promise.all<UploadedInventory>([...files].map(file => {
+    const readAll = Promise.all<ImportedInventory>([...files].map(file => {
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.onload = () => {
@@ -71,18 +72,22 @@ export default function FileUploadModal(modal: ModalProps) {
 
   return (
     <Modal {...modal}>
-      <Modal.Heading>Upload Inventory from JSON</Modal.Heading>
-      <input type="file" onChange={e => readFile(e.target.files)} className="mb-2" />
+      <Modal.Heading>Import Inventory</Modal.Heading>
+
+      <div className="mb-2 relative">
+        <IoPushOutline className="absolute top-2 left-2 text-zinc-300" size={20} />
+        <input type="file" onChange={e => readFile(e.target.files)} className="w-full bg-zinc-950 text-zinc-400 pr-3 max-w-96 rounded-md cursor-pointer file:bg-zinc-800 file:text-zinc-300 file:font-semibold hover:file:bg-zinc-700 file:transition-colors file:py-1 file:px-2 file:pl-10 file:mr-3" />
+      </div>
 
       {!fileSelected
-        ? <p>Select a file to upload.</p>
+        ? <p>Select a file to import.</p>
         : invs.map((inv, i) => (
           <div key={i} className="bg-zinc-950 p-2 rounded-md mt-2">
             {inv.valid
-              ? <div className="flex justify-between text">
-                  <div><span className="font-bold">Name:</span> {inv.name}</div>
-                  <div><span className="font-bold">Str:</span> {inv.strengthScore}</div>
-                  <div><span className="font-bold">Containers:</span> {inv.columns.flat().length}</div>
+              ? <div className="flex justify-between text-zinc-400">
+                  <div><span className="font-bold text-zinc-300">Name:</span> {inv.name}</div>
+                  <div><span className="font-bold text-zinc-300">Str:</span> {inv.strengthScore}</div>
+                  <div><span className="font-bold text-zinc-300">Containers:</span> {inv.columns.flat().length}</div>
                 </div>
               : <p className="text-rose-900">Invalid.</p>
             }
