@@ -3,7 +3,7 @@ import { ModalProps } from "../hooks/useModal";
 import Modal from "./Modal";
 import { Inventory } from "../types";
 import { useInventories } from "../hooks/useInventories";
-import { IoPush, IoPushOutline } from "react-icons/io5";
+import { IoPushOutline } from "react-icons/io5";
 
 type ImportedInventory = 
   | { file: string; valid: false }
