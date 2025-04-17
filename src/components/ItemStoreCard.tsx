@@ -8,6 +8,8 @@ import StoreConfigModal from "./StoreConfigModal"
 import useModal from "../hooks/useModal"
 import ItemEntry from "./ItemEntry"
 import { useInventory } from "../hooks/useInventories"
+import { IoSearchSharp } from "react-icons/io5"
+import SearchItemModal from "./SearchItemModal"
 
 type ItemStoreCardProps = {
   store: ItemContainer,
@@ -20,6 +22,9 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
   const [weight, setWeight] = useState("")
   const [value, setValue] = useState("")
   const [slotsOR, setSlotsOR] = useState("")
+
+  const configModal = useModal()
+  const searchModal = useModal()
 
   const [itemsToDelete, setItemsToDelete] = useState<number[]>([])
 
@@ -76,8 +81,6 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
     document.body.style.cursor = "grabbing"
   }
 
-  const configModal = useModal()
-
   function addItem(e: FormEvent) {
     e.preventDefault()
     if (name.trim().length === 0) return;
@@ -121,6 +124,12 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
     store.items = store.items.filter((_, i) => !itemsToDelete.includes(i))
     clearSelectedItems()
     saveInventory()
+  }
+
+  function addSearchItems(stacks: ItemStack[]) {
+    store.items = [...store.items, ...stacks]
+    saveInventory()
+    searchModal.close()
   }
 
   const totalSlots = calculateContainerSlots(store)
@@ -173,6 +182,7 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
               </>
             )}
             <button type="submit" className="rounded bg-zinc-800 px-2 py-px font-bold cursor-pointer transition-colors hover:bg-zinc-700 ml-2">Add</button>
+            <button type="button" onClick={searchModal.open} className="rounded bg-zinc-800 px-1 py-px font-bold cursor-pointer transition-colors hover:bg-zinc-700"><IoSearchSharp /></button>
           </div>
         </form>
       </div>
@@ -196,6 +206,7 @@ export default function ItemStoreCard({ store }: ItemStoreCardProps) {
         </div>
       </div>
       <StoreConfigModal {...configModal} store={store} saveInventory={saveInventory} />
+      <SearchItemModal {...searchModal} addItems={addSearchItems} />
     </>
   )
 }
